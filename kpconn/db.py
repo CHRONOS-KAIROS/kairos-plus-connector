@@ -34,6 +34,7 @@ class JobRecord(pydantic.BaseModel):
 
 class Connection:
     def __init__(self, data_path: str) -> None:
+        Path(data_path).mkdir(exist_ok=True, parents=True)
         self.db = shelve.open(f"{data_path}/job.shelf")
         self.data_path = data_path
 

@@ -31,12 +31,6 @@ class TestDb:
         assert res.data == job
         assert res.id == jid
 
-    @pytest.mark.skip
-    def test_insert_job_invalid_sdf(self, job: db.Job, dbc: db.Connection) -> None:
-        job.sdf_data["events"] = 19  # type: ignore
-        with pytest.raises(ValidationError):
-            jid = dbc.insert_job(job)
-
     def test_get_job_by_id_not_exists(self, job: db.Job, dbc: db.Connection) -> None:
         with pytest.raises(KeyError):
             dbc.get_job_by_id(db.JobId("not a key"))

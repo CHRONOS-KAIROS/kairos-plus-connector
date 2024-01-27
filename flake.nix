@@ -10,7 +10,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryApplication;
+        p2nix = poetry2nix.lib.mkPoetry2Nix { inherit pkgs; };
       in
       with self.packages.${system};
       {
@@ -22,39 +22,47 @@
         };
 
         packages = {
-          kpconn = pkgs.writeScript "kpconn-runner" ''
-            ${kpconn-deps}/bin/flask --app kpconn/server run -p 3000
+          kpconn-exe = pkgs.writeScript "kpconn-runner" ''
+            #!${pkgs.runtimeShell}
+            ${kpconn-deps}/bin/gunicorn -w 4 "kpconn.server.app:create_app()" --bind 0.0.0.0:8000
           '';
 
-
-          kpconn-deps = (mkPoetryApplication {
+          kpconn-deps = (p2nix.mkPoetryApplication {
             projectDir = ./.;
             python = pkgs.python311;
+            overrides = p2nix.overrides.withDefaults (self: super: {
+              sdfval = super.sdfval.overridePythonAttrs (old: {
+                buildInputs = old.buildInputs or [ ] ++ [ pkgs.python311.pkgs.poetry-core ];
+              });
+            });
           }).dependencyEnv;
+
+          kpconn-source = pkgs.stdenv.mkDerivation {
+            src = ./kpconn;
+            name = "kpconn-source";
+            dontBuild = true;
+            installPhase = ''
+              mkdir -p $out/app
+              cp -r . $out/app/kpconn
+            '';
+          };
+
+          kpconn-docker =
+            pkgs.dockerTools.streamLayeredImage {
+              name = "kpconn";
+              tag = "latest";
+              contents = [
+                pkgs.busybox
+                kpconn-source
+              ];
+              config = {
+                Cmd = [ kpconn-exe ];
+                WorkingDir = "/app";
+              };
+            };
         };
+
+
       }
     );
 }
-          # kpconn = pkgs.stdenv.mkDerivation {
-          #   name = "openera-api-server";
-          #   src = pkgs.nix-gitignore.gitignoreSourcePure [
-          #     ''
-          #       *
-          #     ''
-          #   ] ./.;
-          #   nativeBuildInputs = [
-          #     pkgs.makeWrapper
-          #   ];
-          #   installPhase = ''
-          #     mkdir -p $out/bin $out/etc
-          #     cp run.sh $out/bin/openera
-          #     cp -r sdf-config $out/etc
-          #   '';
-          #   # Make the Python dependencies available to to the run script.
-          #   postFixup = ''
-          #     wrapProgram $out/bin/openera \
-          #       --prefix PATH : ${pkgs.lib.makeBinPath [
-          #         api-server-deps
-          #       ]}
-          #   '';
-          # };

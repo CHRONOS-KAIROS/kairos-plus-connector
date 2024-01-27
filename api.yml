@@ -6,14 +6,10 @@ info:
     the KAIROS Plus project.
   version: 0.1.0
 servers:
-  - url: http://localhost:7200
-    description: Docker Compose server
-  - url: http://gluon:7200
-    description: Docker Compose server
-  - url: http://gluon.lan:7200
-    description: Docker Compose server
   - url: http://lor.lti.cs.cmu.edu:7200
     description: Production connector server
+  - url: http://localhost:7200
+    description: Docker Compose server
 paths:
   /hello:
     get:

@@ -1,4 +1,6 @@
 from typing import Any
+from flask_cors import CORS  # type: ignore
+
 
 import flask
 
@@ -21,4 +23,5 @@ def create_app(config: dict[str, Any] | None = None) -> flask.Flask:
     def hello_world() -> dict:
         return {"message": "Hello, World!"}
 
+    CORS(app)
     return app

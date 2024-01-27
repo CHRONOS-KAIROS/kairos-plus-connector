@@ -60,19 +60,19 @@ class TestSever:
     def test_patch_job(self, client, jid) -> None:
         resp = client.get(f"/jobs/{jid}")
         assert "pending" == resp.json["data"]["status"]
-        resp = client.put(f"/jobs/{jid}", json={"status": "running"})
+        resp = client.patch(f"/jobs/{jid}", json={"status": "running"})
         assert resp.status_code == 200
         resp = client.get(f"/jobs/{jid}")
         assert "running" == resp.json["data"]["status"]
 
     def test_patch_job_not_dict(self, client, jid) -> None:
-        resp = client.put(f"/jobs/{jid}", json="not a dict")
+        resp = client.patch(f"/jobs/{jid}", json="not a dict")
         assert resp.status_code == 400
 
     def test_patch_job_bad_spec(self, client, jid) -> None:
-        resp = client.put(f"/jobs/{jid}", json={"status": "not a status"})
+        resp = client.patch(f"/jobs/{jid}", json={"status": "not a status"})
         assert resp.status_code == 400
-        resp = client.put(f"/jobs/{jid}", json={"bad key": 3})
+        resp = client.patch(f"/jobs/{jid}", json={"bad key": 3})
         assert resp.status_code == 400
 
     def test_pending(self, client, job) -> None:

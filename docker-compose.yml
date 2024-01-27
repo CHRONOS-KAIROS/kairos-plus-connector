@@ -1,0 +1,22 @@
+version: "3.5"
+
+volumes:
+  persist: {}
+
+services:
+  connector:
+    image: kpconn
+    volumes:
+      - persist:/app/data
+    expose:
+      - 8000
+    ports:
+      - 7200:8000
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    volumes:
+      - ./api.yml:/api.yml
+    ports:
+      - 7201:8080
+    environment:
+      SWAGGER_JSON: /api.yml

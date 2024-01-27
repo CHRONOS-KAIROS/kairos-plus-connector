@@ -7,6 +7,14 @@ class TestJob:
     def test_new(self, job_kwargs) -> None:
         db.Job(**job_kwargs)
 
+    def test_new_no_parent(self, job_kwargs) -> None:
+        del job_kwargs["parent"]
+        db.Job(**job_kwargs)
+
+    def test_new_no_sdf(self, job_kwargs) -> None:
+        del job_kwargs["parent"]
+        db.Job(**job_kwargs)
+
     def test_new_bad_sdf(self, job_kwargs) -> None:
         sdf_data = job_kwargs["sdf_data"].copy()
         sdf_data["events"] = 19
@@ -20,7 +28,7 @@ class TestJob:
 
     def test_new_extra_key(self, job_kwargs) -> None:
         with pytest.raises(ValidationError):
-            db.Job(**job_kwargs, bad_key=3)
+            db.Job(**job_kwargs, bad_key=3)  # type: ignore
 
 
 class TestDb:

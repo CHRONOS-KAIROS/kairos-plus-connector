@@ -1,0 +1,188 @@
+openapi: 3.0.3
+info:
+  title: KAIROS Plust Connector API
+  description: |
+    API for communication between OpenEra and the schema induction pipeline for
+    the KAIROS Plus project.
+  version: 0.1.0
+servers:
+  - url: http://localhost:7200
+    description: Docker Compose server
+  - url: http://gluon:7200
+    description: Docker Compose server
+  - url: http://gluon.lan:7200
+    description: Docker Compose server
+  - url: http://lor.lti.cs.cmu.edu:7200
+    description: Production connector server
+paths:
+  /hello:
+    get:
+      summary: Get a simple JSON object to check the connection.
+      responses:
+        '200':
+          description: Hello, World!
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id]
+                properties:
+                  message: 
+                    type: string
+  /jobs:
+    get:
+      summary: Get list of jobs.
+      parameters:
+        - name: status
+          in: query
+          description: Status to filter by.  Default is all statuses.
+          schema:
+            $ref: "#/components/schemas/JobStatus"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobRecord"
+    post:
+      summary: Submit a new job.
+      requestBody:
+        required: true
+        description: Job to create
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Job"
+      responses:
+        '201':
+          description: Job created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobIdObject"
+        '400':
+          description: Bad Job specification
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message]
+                properties:
+                  message:
+                    type: string
+                    description: Description of problem
+  /jobs/{jobId}:
+    get:
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      summary: Get a job by its ID.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRecord"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobIdObject"
+    delete:
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      summary: Delete a job.
+      responses:
+        '200':
+          description: Job deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRecord"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobIdObject"
+    patch:
+      parameters:
+        - $ref: "#/components/parameters/JobId"
+      summary: Update a job.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRecord"
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobIdObject"
+
+
+
+components:
+  parameters:
+    JobId:
+      name: jobId
+      in: path
+      required: true
+      description: ID of Job
+      schema:
+        $ref: "#/components/schemas/JobId"
+  schemas:
+    JobId:
+      type: string
+      description: UUID
+      example: 93cc933c-72b0-42bc-a4ce-7855f7e354a0
+    JobRecord:
+      type: object
+      required:
+        - id
+        - data
+      properties:
+        id:
+          $ref: "#/components/schemas/JobId"
+        data:
+          $ref: "#/components/schemas/Job"
+    JobStatus:
+        type: string
+        enum: [pending, running, failed, completed]
+    Job:
+      type: object
+      required:
+        - title
+        - description
+        - status
+      properties:
+        title:
+          type: string
+          description: Python class name in Python format (camel case)
+          example: AirplaneCrash
+        description:
+          type: string
+          description: Description of Python class to be induced.
+          example: Commercial airliner crashes into ocean.
+        status:
+          $ref: "#/components/schemas/JobStatus"
+        parent:
+          $ref: "#/components/schemas/JobId"
+        sdf_data:
+          $ref: "#/components/schemas/SdfDocument"
+    SdfDocument:
+      type: object
+      description: SDF document; see https://github.com/CHRONOS-KAIROS/sdf-validator/
+    JobIdObject:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: "#/components/schemas/JobId"

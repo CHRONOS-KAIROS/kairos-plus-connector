@@ -58,7 +58,7 @@ def delete_job(jid: db.JobId) -> dict | tuple[dict, int]:
     return resp
 
 
-@bp.route("/<jid>", methods=("PUT",))
+@bp.route("/<jid>", methods=("PATCH",))
 def patch_job(jid: db.JobId) -> dict | tuple[dict, int]:
     dbc = db.Connection(current_app.config["data_path"])
     resp = {"id": jid}

@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
-  title: KAIROS Plust Connector API
+  title: KAIROS Plus Connector API
   description: |
     API for communication between OpenEra and the schema induction pipeline for
     the KAIROS Plus project.
-  version: 0.1.0
+  version: 0.2
 servers:
   - url: http://lor.lti.cs.cmu.edu:7200
     description: Production connector server
@@ -109,6 +109,13 @@ paths:
       parameters:
         - $ref: "#/components/parameters/JobId"
       summary: Update a job.
+      requestBody:
+        required: true
+        description: Properties to update
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Job"
       responses:
         '200':
           description: OK
@@ -158,6 +165,35 @@ components:
         - title
         - description
         - status
+      properties:
+        title:
+          type: string
+          description: Python class name in Python format (camel case)
+          example: AirplaneCrash
+        description:
+          type: string
+          description: Description of Python class to be induced.
+          example: Commercial airliner crashes into ocean.
+        status:
+          $ref: "#/components/schemas/JobStatus"
+        parent:
+          $ref: "#/components/schemas/JobId"
+        sdf_data:
+          $ref: "#/components/schemas/SdfDocument"
+        raw_title:
+          type: string
+          description: The original user input whence the title is derived.
+          example: airplane crash
+        error_message:
+          type: string
+          description: Errors during induction process.
+          example: 'Failed to initialize NVML: Driver/library version mismatch'
+        last_updated:
+          type: string
+          description: When the entry was last updated in ISO format, UTC timezone.
+          example: '2024-02-09T17:49:37.522199'
+    JobPartial:  # Needs to manually be synced with Job
+      type: object
       properties:
         title:
           type: string

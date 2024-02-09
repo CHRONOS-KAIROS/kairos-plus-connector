@@ -1,4 +1,7 @@
+import datetime
+
 import pytest
+
 from kpconn import db
 from pydantic.error_wrappers import ValidationError
 
@@ -9,6 +12,18 @@ class TestJob:
 
     def test_new_no_parent(self, job_kwargs) -> None:
         del job_kwargs["parent"]
+        db.Job(**job_kwargs)
+
+    def test_new_last_updated(self, job_kwargs) -> None:
+        job_kwargs["last_updated"] = datetime.datetime.now()
+        db.Job(**job_kwargs)
+
+    def test_new_error_message(self, job_kwargs) -> None:
+        job_kwargs["error_message"] = "something went wrong"
+        db.Job(**job_kwargs)
+
+    def test_new_raw_title(self, job_kwargs) -> None:
+        job_kwargs["raw_title"] = "foo bar baz"
         db.Job(**job_kwargs)
 
     def test_new_no_sdf(self, job_kwargs) -> None:

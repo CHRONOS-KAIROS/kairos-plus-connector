@@ -2,6 +2,7 @@ import shelve
 from typing import TypedDict, Literal, NewType, cast, Any, TypeVar, Callable
 from pathlib import Path
 import uuid
+import datetime
 
 import pydantic
 import sdfval
@@ -12,6 +13,9 @@ JobId = NewType("JobId", str)
 
 class Job(pydantic.BaseModel):
     title: str
+    raw_title: str | None
+    error_message: str | None
+    last_updated: datetime.datetime | None
     description: str
     status: Status
     parent: JobId | None

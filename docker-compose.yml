@@ -11,7 +11,7 @@ services:
     expose:
       - 8000
     ports:
-      - 7200:8000
+      - 8001:8000
   swagger-ui:
     image: swaggerapi/swagger-ui
     volumes:

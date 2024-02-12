@@ -18,6 +18,8 @@
           packages = with pkgs; [
             poetry
             jq
+            podman-compose
+            swagger-cli
           ];
         };
 

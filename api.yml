@@ -4,7 +4,7 @@ info:
   description: |
     API for communication between OpenEra and the schema induction pipeline for
     the KAIROS Plus project.
-  version: 0.2
+  version: 0.2.1
 servers:
   - url: http://lor.lti.cs.cmu.edu:7200
     description: Production connector server
@@ -115,7 +115,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Job"
+              $ref: "#/components/schemas/JobUpdate"
       responses:
         '200':
           description: OK
@@ -181,18 +181,14 @@ components:
         sdf_data:
           $ref: "#/components/schemas/SdfDocument"
         raw_title:
-          type: string
-          description: The original user input whence the title is derived.
-          example: airplane crash
+          $ref: "#/components/schemas/RawTitle"
         error_message:
-          type: string
-          description: Errors during induction process.
-          example: 'Failed to initialize NVML: Driver/library version mismatch'
+          $ref: "#/components/schemas/ErrorMessage"
         last_updated:
           type: string
           description: When the entry was last updated in ISO format, UTC timezone.
           example: '2024-02-09T17:49:37.522199'
-    JobPartial:  # Needs to manually be synced with Job
+    JobUpdate:  # Needs to manually be synced with Job
       type: object
       properties:
         title:
@@ -209,6 +205,10 @@ components:
           $ref: "#/components/schemas/JobId"
         sdf_data:
           $ref: "#/components/schemas/SdfDocument"
+        raw_title:
+          $ref: "#/components/schemas/RawTitle"
+        error_message:
+          $ref: "#/components/schemas/ErrorMessage"
     SdfDocument:
       type: object
       description: SDF document; see https://github.com/CHRONOS-KAIROS/sdf-validator/
@@ -218,3 +218,11 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/JobId"
+    ErrorMessage:
+      type: string
+      description: Errors during induction process.
+      example: 'Failed to initialize NVML: Driver/library version mismatch'
+    RawTitle:
+      type: string
+      description: The original user input whence the title is derived.
+      example: airplane crash

@@ -6,6 +6,8 @@ volumes:
 services:
   connector:
     image: kpconn
+    environment:
+      CONNECTOR_HOST:  # Insert the hostname here
     volumes:
       - persist:/app/data
     expose:

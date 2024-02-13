@@ -4,6 +4,7 @@ from pathlib import Path
 import uuid
 import datetime
 
+
 import pydantic
 import sdfval
 
@@ -37,7 +38,7 @@ class JobRecord(pydantic.BaseModel):
 
 
 def update_job_timestamp(job: Job) -> None:
-    job.last_updated = datetime.datetime.now().isoformat()
+    job.last_updated = datetime.datetime.now().isoformat() + "Z"
 
 
 class Connection:

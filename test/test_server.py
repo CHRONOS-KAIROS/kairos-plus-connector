@@ -12,7 +12,7 @@ def jid(client, job) -> db.JobId:
     return resp.json["id"]
 
 
-class TestSever:
+class TestServer:
     def test_hello(self, client) -> None:
         resp = client.get("/hello")
         data = resp.json
@@ -41,7 +41,9 @@ class TestSever:
         resp = client.get(f"/jobs/{jid}")
         assert resp.status_code == 200
         assert resp.json["id"] == jid
-        assert resp.json["data"] == job.dict()
+        resp_json = resp.json.copy()
+        resp_json["data"]["last_updated"] = None
+        assert resp_json["data"] == job.dict()
 
     def test_get_job_not_found(self, client, job) -> None:
         resp = client.get(f"/jobs/not-here")
@@ -91,6 +93,8 @@ class TestSever:
         orig_sorted = sorted(orig_records, key=key)
         results_sorted = sorted(res_records, key=key)
         assert all([rec["data"]["status"] == "pending" for rec in res_records])
+        for x in results_sorted:
+            x["data"]["last_updated"] = None
         assert orig_sorted == results_sorted
 
     def test_pending_bad_status(self, client) -> None:

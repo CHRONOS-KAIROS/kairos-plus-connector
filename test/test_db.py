@@ -5,6 +5,8 @@ import pytest
 from kpconn import db
 from pydantic.error_wrappers import ValidationError
 
+from .conftest import assert_jobs_equal
+
 
 class TestJob:
     def test_new(self, job_kwargs) -> None:
@@ -65,7 +67,9 @@ class TestDb:
         records = [db.JobRecord(id=dbc.insert_job(job), data=job) for _ in range(3)]
         res = dbc.get_jobs_by_status("running")
         key = lambda x: x.id
-        assert sorted(res, key=key) == sorted(records, key=key)
+        for x, y in zip(sorted(res, key=key), sorted(records, key=key)):
+            assert x.id == y.id
+            assert_jobs_equal(x.data, y.data)
 
     def test_get_jobs_by_parent(self, job: db.Job, dbc: db.Connection) -> None:
         dbc.insert_job(job)
@@ -74,7 +78,9 @@ class TestDb:
         records = [db.JobRecord(id=dbc.insert_job(job), data=job) for _ in range(3)]
         res = dbc.get_jobs_by_parent(parent_id)
         key = lambda x: x.id
-        assert sorted(res, key=key) == sorted(records, key=key)
+        for x, y in zip(sorted(res, key=key), sorted(records, key=key)):
+            assert x.id == y.id
+            assert_jobs_equal(x.data, y.data)
 
     def test_delete_job(self, job: db.Job, dbc: db.Connection) -> None:
         dbc.insert_job(job)
@@ -83,7 +89,7 @@ class TestDb:
         with pytest.raises(KeyError):
             dbc.get_job_by_id(jid)
 
-    def test_delete_job(self, job: db.Job, dbc: db.Connection) -> None:
+    def test_update_job(self, job: db.Job, dbc: db.Connection) -> None:
         dbc.insert_job(job)
         jid = dbc.insert_job(job)
         assert job.status == "pending"

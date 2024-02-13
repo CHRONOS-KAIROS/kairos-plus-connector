@@ -36,6 +36,10 @@ class JobRecord(pydantic.BaseModel):
     data: Job
 
 
+def update_job_timestamp(job: Job) -> None:
+    job.last_updated = datetime.datetime.now().isoformat()
+
+
 class Connection:
     def __init__(self, data_path: str) -> None:
         Path(data_path).mkdir(exist_ok=True, parents=True)
@@ -44,6 +48,7 @@ class Connection:
 
     def insert_job(self, job: Job) -> JobId:
         jid = JobId(str(uuid.uuid4()))
+        update_job_timestamp(job)
         self.db[str(jid)] = job
         return jid
 
@@ -56,6 +61,7 @@ class Connection:
 
     def update_job(self, jid: JobId, job: Job) -> JobRecord:
         self.db[jid] = job
+        update_job_timestamp(job)
         return JobRecord(id=jid, data=job)
 
     def get_jobs(self) -> list[JobRecord]:

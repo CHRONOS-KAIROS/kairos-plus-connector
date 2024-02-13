@@ -54,3 +54,13 @@ def dbc(tmp_path) -> Iterator[db.Connection]:
     dbc = db.Connection(tmp_path)
     yield dbc
     dbc.close()
+
+
+def assert_jobs_equal(x: db.Job, y: db.Job) -> None:
+    xlu = x.last_updated
+    ylu = y.last_updated
+    x.last_updated = None
+    y.last_updated = None
+    assert x == y
+    x.last_updated = xlu
+    y.last_updated = ylu

@@ -20,6 +20,7 @@ class Job(pydantic.BaseModel):
     description: str
     status: Status
     parent: JobId | None
+    generated_for: sdfval.sdf.DocumentId | None
     sdf_data: sdfval.Document | None
 
     class Config:

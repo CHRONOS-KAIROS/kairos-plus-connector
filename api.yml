@@ -4,7 +4,7 @@ info:
   description: |
     API for communication between OpenEra and the schema induction pipeline for
     the KAIROS Plus project.
-  version: 0.2.1
+  version: 0.2.2
 servers:
   - url: http://lor.lti.cs.cmu.edu:7200
     description: Production connector server
@@ -188,6 +188,8 @@ components:
           type: string
           description: When the entry was last updated in ISO format, UTC timezone.
           example: '2024-02-09T17:49:37.522199'
+        generated_for:
+          $ref: "#/components/schemas/GeneratedFor"
     JobUpdate:  # Needs to manually be synced with Job
       type: object
       properties:
@@ -226,3 +228,6 @@ components:
       type: string
       description: The original user input whence the title is derived.
       example: airplane crash
+    GeneratedFor:
+      type: string
+      description: Contains an SDF document ID if the induction job is generating subevents for a speccific schema.
